@@ -32,7 +32,7 @@
  * - クエリパラメータ key が MANUAL_TRIGGER_KEY と一致すること
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { loadConfig } from '../../src/config';
 import { buildSearchQueries } from '../../src/utils/query-builder';
 import { processTweets } from '../../src/services/tweet-processor';
@@ -231,8 +231,16 @@ describe('システム統合仕様', () => {
     });
 
     it('NotificationSummary の date は YYYY/MM/DD 形式であること', () => {
-      const summary = buildNotificationSummary([], [], 0, 0);
-      expect(summary.date).toMatch(/^\d{4}\/\d{2}\/\d{2}$/);
+      vi.useFakeTimers();
+      try {
+        vi.setSystemTime(new Date('2026-02-10T08:00:00.000Z'));
+
+        const summary = buildNotificationSummary([], [], 0, 0);
+        // UTC 08:00 → JST 17:00 → 2026/02/10
+        expect(summary.date).toBe('2026/02/10');
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 });

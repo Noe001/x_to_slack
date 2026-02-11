@@ -437,11 +437,32 @@ describe('Slack 通知仕様', () => {
     });
 
     it('日付は JST（UTC+9）形式 YYYY/MM/DD であること', () => {
-      const tweets: ProcessedTweet[] = [];
-      const summary = buildNotificationSummary(tweets, [], 0, 0);
+      // UTCでの特定の日時を設定 (JSTでは 2026-02-10 09:00:00)
+      vi.useFakeTimers();
+      try {
+        vi.setSystemTime(new Date('2026-02-10T00:00:00.000Z'));
 
-      // YYYY/MM/DD 形式であること
-      expect(summary.date).toMatch(/^\d{4}\/\d{2}\/\d{2}$/);
+        const tweets: ProcessedTweet[] = [];
+        const summary = buildNotificationSummary(tweets, [], 0, 0);
+
+        expect(summary.date).toBe('2026/02/10');
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it('UTC深夜でもJST換算で正しい日付になること', () => {
+      // UTC 2026-02-09 20:00 = JST 2026-02-10 05:00 → 日付は 2026/02/10
+      vi.useFakeTimers();
+      try {
+        vi.setSystemTime(new Date('2026-02-09T20:00:00.000Z'));
+
+        const summary = buildNotificationSummary([], [], 0, 0);
+
+        expect(summary.date).toBe('2026/02/10');
+      } finally {
+        vi.useRealTimers();
+      }
     });
 
     it('統計情報に fetched, filtered, displayed が含まれること', () => {

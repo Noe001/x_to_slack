@@ -23,7 +23,7 @@
  * - デフォルトは24時間
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { buildSearchQueries, getStartTime } from '../../src/utils/query-builder';
 import { createGlobalSettings, createKeywordEntry } from './fixtures';
 
@@ -174,6 +174,18 @@ describe('検索クエリ構築仕様', () => {
   // 時間範囲仕様
   // ============================================================
   describe('検索時間範囲 (getStartTime)', () => {
+    // 日時を固定して決定論的なテストにする
+    const FIXED_NOW = new Date('2026-02-10T12:00:00.000Z');
+
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(FIXED_NOW);
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
     it('ISO 8601 形式の日時文字列を返すこと', () => {
       const startTime = getStartTime();
 
@@ -182,35 +194,30 @@ describe('検索クエリ構築仕様', () => {
 
     it('デフォルトでは24時間前の日時を返すこと', () => {
       const startTime = getStartTime();
-      const parsed = new Date(startTime);
-      const expectedMs = Date.now() - 24 * 60 * 60 * 1000;
 
-      // 実行時間の誤差を1秒以内で許容
-      expect(Math.abs(parsed.getTime() - expectedMs)).toBeLessThan(1000);
+      // 2026-02-10T12:00:00.000Z の24時間前 = 2026-02-09T12:00:00.000Z
+      expect(startTime).toBe('2026-02-09T12:00:00.000Z');
     });
 
     it('指定した時間数に応じた過去の日時を返すこと', () => {
-      const hours = 48;
-      const startTime = getStartTime(hours);
-      const parsed = new Date(startTime);
-      const expectedMs = Date.now() - hours * 60 * 60 * 1000;
+      const startTime = getStartTime(48);
 
-      expect(Math.abs(parsed.getTime() - expectedMs)).toBeLessThan(1000);
+      // 2026-02-10T12:00:00.000Z の48時間前 = 2026-02-08T12:00:00.000Z
+      expect(startTime).toBe('2026-02-08T12:00:00.000Z');
     });
 
     it('返却値は現在時刻より過去であること', () => {
       const startTime = getStartTime(1);
       const parsed = new Date(startTime);
 
-      expect(parsed.getTime()).toBeLessThan(Date.now());
+      expect(parsed.getTime()).toBeLessThan(FIXED_NOW.getTime());
     });
 
     it('1時間前のような短い時間範囲でも正しく動作すること', () => {
       const startTime = getStartTime(1);
-      const parsed = new Date(startTime);
-      const expectedMs = Date.now() - 1 * 60 * 60 * 1000;
 
-      expect(Math.abs(parsed.getTime() - expectedMs)).toBeLessThan(1000);
+      // 2026-02-10T12:00:00.000Z の1時間前 = 2026-02-10T11:00:00.000Z
+      expect(startTime).toBe('2026-02-10T11:00:00.000Z');
     });
   });
 });
