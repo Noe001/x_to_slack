@@ -1,0 +1,25 @@
+name = "x-to-slack"
+main = "src/index.ts"
+compatibility_date = "2025-01-10"
+
+# Cloudflare Workers Paid プラン推奨
+# レート制限の詳細については以下を参照:
+# https://developers.cloudflare.com/workers/platform/limits/
+
+[triggers]
+# 毎日 17:00 JST (UTC 08:00) に実行
+crons = ["0 8 * * *"]
+
+# 環境変数（以下は特にローカル開発用）
+# 本番環境では wrangler secret コマンドで設定すること
+# wrangler secret put X_BEARER_TOKEN
+# wrangler secret put SLACK_WEBHOOK_URL
+# wrangler secret put MANUAL_TRIGGER_KEY
+
+# ローカル開発用
+# [vars]
+# ローカル環境で .dev.vars ファイルを使用する
+
+# アセット設定（不要な場合はコメントアウト）
+# [site]
+# bucket = "./public"

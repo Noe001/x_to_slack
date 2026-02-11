@@ -1,0 +1,14 @@
+# ローカル開発用環境変数サンプル
+# このファイルをコピーして .dev.vars という名前で保存してください
+# .dev.vars は .gitignore に含まれているため、Git にコミットされません
+
+# X API Bearer Token
+# 取得方法: https://developer.x.com/ でプロジェクトを作成し、App Settings から取得
+X_BEARER_TOKEN=your_x_bearer_token_here
+
+# Slack Incoming Webhook URL
+# 取得方法: https://api.slack.com/messaging/webhooks でワークスペースに追加
+SLACK_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/WEBHOOK/URL
+
+# 手動実行用のトリガーキー（任意の文字列）
+MANUAL_TRIGGER_KEY=your_secret_key_here

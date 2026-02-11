@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "global_settings": {
+    "min_likes": 3,
+    "max_results": 50,
+    "lang": "ja"
+  },
+  "keywords": [
+    { "term": "#Rails", "min_likes": 5 },
+    { "term": "#Ruby" },
+    { "term": "Next.js" },
+    { "term": "Hono Framework" }
+  ]
+}
